@@ -11,12 +11,17 @@ public class BankImpl implements Bank {
     private List<Account> accounts;
     private static long customerID;
     private SequenceGenerator accountID;
+    private SequenceGenerator paymentID;
+    private CurrencyConverter currencyConverter;
 
-    public BankImpl() {
+
+    public BankImpl(CurrencyConverter currencyConverter) {
         this.customers = new ArrayList<>();
         this.accounts = new ArrayList<>();
         this.accountID = new SequenceGenerator();
+        this.paymentID = new SequenceGenerator();
         customerID = 0;
+        this.currencyConverter = currencyConverter;
     }
 
     @Override
@@ -50,9 +55,13 @@ public class BankImpl implements Bank {
 
     @Override
     public Operation transferMoney(Account debit, Account credit, Money amountToTransfer) {
-
-
-        return null;
+        if (debit.getBalance().isLessThan(amountToTransfer)) {
+            throw new InsufficientFundsException("x");
+        }
+            Money moneyConverted = currencyConverter.convert(debit.getCurrency(), credit.getCurrency(), amountToTransfer);
+            debit.setBalance(debit.getBalance().substract(amountToTransfer));
+            credit.setBalance(credit.getBalance().add(moneyConverted));
+            return new Operation(paymentID.getNext(), debit, credit, amountToTransfer);
     }
 
     @Override
@@ -60,7 +69,7 @@ public class BankImpl implements Bank {
         Money totalBalance = new Money(0);
 
         for (Account a : accounts) {
-            totalBalance = totalBalance.add(a.getBalance());
+            totalBalance = totalBalance.add(currencyConverter.convert(a.getCurrency(), currency, a.getBalance()));
         }
 
         return totalBalance;

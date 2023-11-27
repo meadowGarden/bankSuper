@@ -2,10 +2,24 @@ package src;
 
 import lt.itakademija.exam.*;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class Main {
     public static void main(String[] args) {
 
-        BankImpl bank = new BankImpl();
+//        CurrencyRatesProvider.CurrencyPair pair = new CurrencyRatesProvider.CurrencyPair(new Currency("USD"), new Currency("EUR"));
+        CurrencyRatesProvider.CurrencyPair pair = new CurrencyRatesProvider.CurrencyPair(new Currency("EUR"), new Currency("USD"));
+
+        Money rate = new Money(1.1);
+        Map<CurrencyRatesProvider.CurrencyPair, Money> map = new HashMap<>();
+        map.put(pair, rate);
+
+        CurrencyRatesProvider ratesProvider = new CurrencyRatesProvider(map);
+
+        CurrencyConverter converter = new CurrencyConverterImpl(ratesProvider);
+
+        BankImpl bank = new BankImpl(converter);
         Customer customer01 = bank.createCustomer(new PersonCode("iiii"), new PersonName("john", "doe"));
         System.out.println(customer01);
         Account account01 = bank.createAccount(customer01, new Currency("USD"));
@@ -23,17 +37,10 @@ public class Main {
         bank.transferMoney(account01, account02, new Money(600));
         System.out.println(account01);
         System.out.println(account02);
+        System.out.println(bank.transferMoney(account01, account02, new Money(100)));
+
 
         System.out.println("-------");
-
-
-        CurrencyConverterImpl converter = new CurrencyConverterImpl();
-        Money convertedMoney = converter.convert(new Currency("USD"), new Currency("EUR"), new Money(600));
-        System.out.println(convertedMoney);
-
-
-
-//        bank.transferMoney()
 
     }
 }

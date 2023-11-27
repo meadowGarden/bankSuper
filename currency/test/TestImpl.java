@@ -11,11 +11,11 @@ public class TestImpl extends BaseTest {
 
     @Override
     protected Bank createBank(CurrencyConverter currencyConverter) {
-        return new BankImpl();
+        return new BankImpl(currencyConverter);
     }
 
     @Override
     protected CurrencyConverter createCurrencyConverter(CurrencyRatesProvider currencyRatesProvider) {
-        return new CurrencyConverterImpl();
+        return new CurrencyConverterImpl(currencyRatesProvider);
     }
 }
