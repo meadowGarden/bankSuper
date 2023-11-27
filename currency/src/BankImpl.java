@@ -10,10 +10,12 @@ public class BankImpl implements Bank {
     private List<Customer> customers;
     private List<Account> accounts;
     private static long customerID;
+    private SequenceGenerator accountID;
 
     public BankImpl() {
         this.customers = new ArrayList<>();
         this.accounts = new ArrayList<>();
+        this.accountID = new SequenceGenerator();
         customerID = 0;
     }
 
@@ -40,7 +42,7 @@ public class BankImpl implements Bank {
         if (!customers.contains(customer)) {
             throw new AccountCreateException("x");
         }
-        Account account = new Account(new SequenceGenerator().getNext(), customer, currency, new Money(0));
+        Account account = new Account(accountID.getNext(), customer, currency, new Money(0));
         customer.addAccount(account);
         accounts.add(account);
         return account;
